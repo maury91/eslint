@@ -32,6 +32,10 @@ ruleTester.run("padded-blocks", rule, {
         {code: "{\n\na = 1\n\n}" },
         {code: "{//comment\n\na();\n\n}" },
         {code: "{\n\na();\n\n/* comment */ }" },
+        {code: "switch (a) {}"},
+        {code: "switch (a) {\n\ncase 0: foo();\ncase 1: bar();\n\n}"},
+        {code: "switch (a) {\n\n//comment\ncase 0: foo();//comment\n\n}"},
+        {code: "switch (a) {//coment\n\ncase 0: foo();\ncase 1: bar();\n\n/* comment */}"},
         {code: "{\na();\n}", options: ["never"]},
         {code: "{\na();}", options: ["never"]},
         {code: "{a();\n}", options: ["never"]},
@@ -45,7 +49,8 @@ ruleTester.run("padded-blocks", rule, {
         {code: "function a() {\n/* comment */\nreturn;\n/* comment*/\n}", options: ["never"] },
         {code: "{\n// comment\ndebugger;\n// comment\n}", options: ["never"] },
         {code: "{\n\n// comment\nif (\n// comment\n a) {}\n\n }", options: ["always"] },
-        {code: "{\n// comment\nif (\n// comment\n a) {}\n }", options: ["never"] }
+        {code: "{\n// comment\nif (\n// comment\n a) {}\n }", options: ["never"] },
+        {code: "switch (a) {\ncase 0: foo();\n}", options: ["never"]}
     ],
     invalid: [
         {
@@ -136,6 +141,32 @@ ruleTester.run("padded-blocks", rule, {
             ]
         },
         {
+            code: "switch (a) {\ncase 0: foo();\ncase 1: bar();\n}",
+            errors: [
+                {
+                    message: ALWAYS_MESSAGE,
+                    line: 1
+                },
+                {
+                    message: ALWAYS_MESSAGE,
+                    line: 4
+                }
+            ]
+        },
+        {
+            code: "switch (a) {\n//comment\ncase 0: foo();//comment\n}",
+            errors: [
+                {
+                    message: ALWAYS_MESSAGE,
+                    line: 1
+                },
+                {
+                    message: ALWAYS_MESSAGE,
+                    line: 4
+                }
+            ]
+        },
+        {
             code: "{a();}",
             errors: [
                 {
@@ -219,6 +250,17 @@ ruleTester.run("padded-blocks", rule, {
         },
         {
             code: "{\n\n// comment\nif (\n// comment\n a) {}\n}",
+            options: ["never"],
+            errors: [
+                {
+                    message: NEVER_MESSAGE,
+                    line: 1,
+                    column: 1
+                }
+            ]
+        },
+        {
+            code: "switch (a) {\n\ncase 0: foo();\n}",
             options: ["never"],
             errors: [
                 {
