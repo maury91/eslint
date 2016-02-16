@@ -56,6 +56,10 @@ ruleTester.run("no-useless-constructor", rule, {
         {
             code: "class A { dummyMethod(){ doSomething(); } }",
             parserOptions: { ecmaVersion: 6 }
+        },
+        {
+            code: "class A extends B.C { constructor() { super(foo); } }",
+            parserOptions: { ecmaVersion: 6 }
         }
     ],
     invalid: [
@@ -88,7 +92,11 @@ ruleTester.run("no-useless-constructor", rule, {
             code: "class A extends B { constructor(foo, bar){ super(foo); } }",
             parserOptions: { ecmaVersion: 6 },
             errors: [error]
+        },
+        {
+            code: "class A extends B.C { constructor() { super(...arguments); } }",
+            parserOptions: { ecmaVersion: 6 },
+            errors: [error]
         }
-
     ]
 });
